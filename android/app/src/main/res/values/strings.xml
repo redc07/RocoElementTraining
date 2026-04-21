@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Roco Element Trainer</string>
+    <string name="title_activity_main">Roco Element Trainer</string>
+    <string name="package_name">com.roco.trainer</string>
+    <string name="custom_url_scheme">com.roco.trainer</string>
+</resources>
