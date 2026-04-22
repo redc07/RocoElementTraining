@@ -95,7 +95,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight text-white uppercase" id="app-title">
-              洛克王国·属性克制训练系统
+              洛克王国世界·属性克制训练系统
             </h1>
             <p className="text-[10px] text-[#94A3B8] font-mono tracking-widest" id="app-description">
               MASTER ATTRIBUTE COUNTER TABLE V1.0

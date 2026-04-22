@@ -1,6 +1,6 @@
 {
-  "name": "Roco Element Trainer",
-  "description": "A specialized training tool for Roco Kingdom (洛克王国) element effectiveness chart. Practice and memorize type advantages and disadvantages with interactive table testing.",
+  "name": "洛克王国世界属性克制训练系统V1.0",
+  "description": "专业版洛克王国世界属性克制计算与训练系统，支持全18系属性克制关系查询与记忆测试。",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
