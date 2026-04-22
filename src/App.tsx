@@ -46,6 +46,7 @@ export default function App() {
     if (confirm('确定要清除所有进度吗？')) {
       setUserMatrix(Array(ATTRIBUTES.length).fill(null).map(() => Array(ATTRIBUTES.length).fill(Effectiveness.NORMAL)));
       setIsVerified(false);
+      setShowAnswers(false);
     }
   };
 
@@ -117,38 +118,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
-        {/* Stats Section Overlay-ish */}
-        <AnimatePresence>
-          {isVerified && (
-            <motion.div
-              id="stats-panel"
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              className="bg-[#1E293B] rounded-xl p-5 border border-[#334155] flex flex-col md:flex-row items-center gap-6 shadow-2xl"
-            >
-              <div className="flex items-center gap-4 shrink-0">
-                <div className="w-12 h-12 rounded-lg bg-[#4F46E5]/20 flex items-center justify-center text-[#6366F1]">
-                  <Trophy size={24} />
-                </div>
-                <div>
-                  <div className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest">Accuracy</div>
-                  <div className="text-2xl font-bold text-white">{stats.percent}%</div>
-                </div>
-              </div>
-              <div className="flex-1 w-full bg-[#334155] h-2 rounded-full overflow-hidden relative">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${stats.percent}%` }}
-                  className="absolute inset-0 bg-[#4F46E5] shadow-[0_0_10px_rgba(79,70,229,0.5)]" 
-                />
-              </div>
-              <div className="text-[#94A3B8] text-xs font-mono border-l border-[#334155] pl-6 hidden md:block">
-                SUCCESS: {stats.correct} / {stats.total}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Stats Section Removed (Requested by user) */}
 
         {/* Matrix Area */}
         <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-hidden mb-4" id="matrix-container">
@@ -207,19 +177,19 @@ export default function App() {
                           key={`${atkAttr.id}-${defAttr.id}`}
                           onClick={() => toggleCell(aIdx, dIdx)}
                           className={`
-                            border-r border-b border-[#334155] relative cursor-pointer
+                            border-r border-b border-[#334155] relative cursor-pointer overflow-hidden
                             transition-all duration-150
                             ${isError ? 'bg-red-500/10 shadow-[inset_0_0_8px_rgba(239,68,68,0.3)]' : ''}
                             ${isCorrectFilled ? 'bg-emerald-500/5' : ''}
                             hover:bg-[#334155]
                           `}
                         >
-                          <div className="w-full h-full flex items-center justify-center pointer-events-none relative overflow-hidden">
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                             {/* User Selected Icons */}
                             {userValue === Effectiveness.SUPER && (
                               <motion.div 
                                 initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                className={`w-[70%] h-[70%] rounded-full border-[clamp(3px,0.5vw,12px)] border-[#10B981] ${showAnswers && trueEnum !== Effectiveness.SUPER ? 'opacity-30' : ''}`} 
+                                className={`w-[clamp(14px,1.8vw,48px)] aspect-square rounded-full border-[clamp(2px,0.3vw,8px)] border-[#10B981] ${showAnswers && trueEnum !== Effectiveness.SUPER ? 'opacity-20' : ''}`} 
                               />
                             )}
                             {userValue === Effectiveness.RESISTED && (
@@ -228,18 +198,18 @@ export default function App() {
                                 style={{
                                   width: 0,
                                   height: 0,
-                                  borderLeft: 'clamp(10px, 1.4vw, 36px) solid transparent',
-                                  borderRight: 'clamp(10px, 1.4vw, 36px) solid transparent',
-                                  borderBottom: 'clamp(18px, 2.5vw, 64px) solid #EF4444',
+                                  borderLeft: 'clamp(7px, 0.9vw, 24px) solid transparent',
+                                  borderRight: 'clamp(7px, 0.9vw, 24px) solid transparent',
+                                  borderBottom: 'clamp(12px, 1.6vw, 42px) solid #EF4444',
                                 }}
-                                className={showAnswers && trueEnum !== Effectiveness.RESISTED ? 'opacity-30' : ''}
+                                className={showAnswers && trueEnum !== Effectiveness.RESISTED ? 'opacity-20' : ''}
                               />
                             )}
 
                             {/* Correct Answer Overlays (if showAnswers is ON) */}
                             {showAnswers && trueEnum === Effectiveness.SUPER && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-[90%] h-[90%] rounded-full border-[clamp(4px,0.6vw,16px)] border-emerald-400 shadow-[0_0_2vw_rgba(52,211,153,0.8)] z-10" />
+                                <div className="w-[clamp(14px,1.8vw,48px)] aspect-square rounded-full border-[clamp(3px,0.4vw,12px)] border-emerald-400 shadow-[0_0_1vw_rgba(52,211,153,0.7)] z-10" />
                               </div>
                             )}
                             {showAnswers && trueEnum === Effectiveness.RESISTED && (
@@ -248,10 +218,10 @@ export default function App() {
                                   style={{
                                     width: 0,
                                     height: 0,
-                                    borderLeft: 'clamp(12px, 1.8vw, 48px) solid transparent',
-                                    borderRight: 'clamp(12px, 1.8vw, 48px) solid transparent',
-                                    borderBottom: 'clamp(22px, 3.2vw, 84px) solid #F87171',
-                                    filter: 'drop-shadow(0 0 1vw rgba(248,113,113,0.8))'
+                                    borderLeft: 'clamp(7px, 0.9vw, 24px) solid transparent',
+                                    borderRight: 'clamp(7px, 0.9vw, 24px) solid transparent',
+                                    borderBottom: 'clamp(12px, 1.6vw, 42px) solid #F87171',
+                                    filter: 'drop-shadow(0 0 0.6vw rgba(248,113,113,0.7))'
                                   }}
                                   className="z-10"
                                 />
@@ -259,19 +229,19 @@ export default function App() {
                             )}
                             {showAnswers && trueEnum === Effectiveness.NORMAL && userValue !== Effectiveness.NORMAL && (
                               <div className="absolute inset-0 flex items-center justify-center opacity-70">
-                                <div className="text-[clamp(10px,1.2vw,28px)] font-black text-slate-400 uppercase bg-slate-800 px-[10%] py-[5%] rounded-lg border-[2px] border-slate-700">NORMAL</div>
+                                <div className="text-[clamp(8px,0.8vw,20px)] font-black text-slate-400 uppercase bg-slate-800 px-[8%] py-[4%] rounded-lg border-[1px] border-slate-700">普通</div>
                               </div>
                             )}
 
                             {/* Indicators */}
                             {isVerified && !isCorrect && (
                               <div className="absolute top-[5%] right-[5%] text-red-500 opacity-60">
-                                <X className="w-[1.2vw] h-[1.2vw] min-w-[12px] min-h-[12px]" strokeWidth={4} />
+                                <X className="w-[1vw] h-[1vw] min-w-[8px] min-h-[8px]" strokeWidth={4} />
                               </div>
                             )}
                             {isVerified && isCorrect && userValue !== Effectiveness.NORMAL && (
                               <div className="absolute top-[5%] right-[5%] text-emerald-500 opacity-60">
-                                <Check className="w-[1.2vw] h-[1.2vw] min-w-[12px] min-h-[12px]" strokeWidth={4} />
+                                <Check className="w-[1vw] h-[1vw] min-w-[8px] min-h-[8px]" strokeWidth={4} />
                               </div>
                             )}
                           </div>
@@ -292,12 +262,15 @@ export default function App() {
           <div className="px-3 py-1 bg-[#0F172A] border border-[#334155] rounded-full text-[10px] font-mono text-[#6366F1] uppercase tracking-tighter transition-all">
             {isVerified ? 'STATUS: VALIDATION COMPLETE' : 'STATUS: READY FOR VALIDATION'}
           </div>
-          <div className="text-[10px] text-[#94A3B8] font-mono uppercase tracking-widest">
-            PROGRESS: {stats.attempted} / {stats.total} ({(stats.attempted/stats.total*100).toFixed(0)}%)
-          </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 w-full md:w-auto">
+        <div className="flex flex-wrap gap-4 w-full md:w-auto items-center">
+          {isVerified && (
+            <div className="mr-4 flex flex-col items-end">
+              <span className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-widest">Score</span>
+              <span className="text-2xl font-black text-[#10B981] leading-none">{stats.percent}%</span>
+            </div>
+          )}
           <button
             id="btn-reset"
             onClick={resetAll}
