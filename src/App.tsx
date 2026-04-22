@@ -93,38 +93,36 @@ export default function App() {
   return (
     <div className="h-screen bg-[#0F172A] text-[#E2E8F0] font-sans flex flex-col overflow-hidden" id="app-root">
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-5 bg-[#1E293B] border-b border-[#334155] shadow-lg sticky top-0 z-50" id="main-header">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-[#4F46E5] rounded flex items-center justify-center font-bold text-xl text-white shadow-lg shadow-indigo-950/20">
+      <header className="flex items-center justify-between px-6 py-2 bg-[#1E293B] border-b border-[#334155] shadow-lg sticky top-0 z-50 shrink-0" id="main-header">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-[#4F46E5] rounded flex items-center justify-center font-bold text-lg text-white shadow-lg">
             R
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight text-white uppercase" id="app-title">
+            <h1 className="text-base font-bold tracking-tight text-white uppercase" id="app-title">
               洛克王国世界·属性克制训练系统
             </h1>
-            <p className="text-[10px] text-[#94A3B8] font-mono tracking-widest" id="app-description">
+            <p className="text-[8px] text-[#94A3B8] font-mono tracking-widest leading-none">
               MASTER ATTRIBUTE COUNTER TABLE V1.0
             </p>
           </div>
         </div>
-        <div className="hidden md:flex gap-8 text-sm">
+        <div className="hidden md:flex gap-6 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full border-2 border-[#10B981]" />
-            <span className="text-[#94A3B8] font-medium">克制 (Strong)</span>
+            <div className="w-3 h-3 rounded-full border-2 border-[#10B981]" />
+            <span className="text-[#94A3B8] font-medium">克制 (○)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-0 h-0 border-l-[7px] border-r-[7px] border-b-[12px] border-b-[#EF4444]" />
-            <span className="text-[#94A3B8] font-medium">被克制 (Weak)</span>
+            <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-b-[#EF4444]" />
+            <span className="text-[#94A3B8] font-medium">被克制 (△)</span>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
-        {/* Stats Section Removed (Requested by user) */}
-
+      <main className="flex-1 p-3 flex flex-col gap-3 min-h-0 overflow-hidden">
         {/* Matrix Area */}
-        <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-hidden mb-4" id="matrix-container">
+        <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-hidden" id="matrix-container">
           <div className="w-full h-full">
             <table key={resetCounter} className="w-full h-full border-collapse table-fixed select-none" id="matrix-table">
               <thead>
@@ -259,60 +257,94 @@ export default function App() {
         </div>
       </main>
 
-      {/* Footer Controls */}
-      <footer className="p-6 bg-[#1e293b] border-t border-[#334155] flex flex-col md:flex-row justify-between items-center gap-6" id="footer-controls">
-        <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start">
-          <div className="px-3 py-1 bg-[#0F172A] border border-[#334155] rounded-full text-[10px] font-mono text-[#6366F1] uppercase tracking-tighter transition-all">
-            {isVerified ? 'STATUS: VALIDATION COMPLETE' : 'STATUS: READY FOR VALIDATION'}
+      {/* Footer Controls & Usage Guide */}
+      <footer className="p-4 bg-[#1e293b] border-t border-[#334155] shrink-0" id="footer-controls">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+          <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start">
+            <div className="px-3 py-1 bg-[#0F172A] border border-[#334155] rounded-full text-[10px] font-mono text-[#6366F1] uppercase tracking-tighter transition-all">
+              {isVerified ? 'STATUS: VALIDATION COMPLETE' : 'STATUS: READY FOR VALIDATION'}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4 w-full md:w-auto items-center">
+            {isVerified && (
+              <div className="mr-4 flex flex-col items-end">
+                <span className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-widest">Score</span>
+                <span className="text-2xl font-black text-[#10B981] leading-none">{stats.percent}%</span>
+              </div>
+            )}
+            <button
+              id="btn-reset"
+              onClick={resetAll}
+              className="flex-1 md:flex-none px-6 py-2 border border-[#334155] rounded-lg text-sm font-semibold text-[#94A3B8] hover:bg-[#334155] hover:text-white transition-all active:scale-95"
+            >
+              重置表格
+            </button>
+            
+            {isVerified && (
+              <button
+                id="btn-show-answers"
+                onClick={() => setShowAnswers(!showAnswers)}
+                className={`flex-1 md:flex-none px-6 py-2 border rounded-lg text-sm font-bold transition-all active:scale-95 shadow-lg ${
+                  showAnswers 
+                  ? 'bg-[#6366F1] border-[#818CF8] text-white shadow-indigo-500/20' 
+                  : 'bg-[#1E293B] border-[#334155] text-[#94A3B8] hover:border-[#475569] hover:text-white'
+                }`}
+              >
+                {showAnswers ? '隐藏正确答案' : '查看正确答案'}
+              </button>
+            )}
+
+            {!isVerified ? (
+              <button
+                id="btn-verify"
+                onClick={verifyResults}
+                className="flex-1 md:w-56 px-10 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg text-sm font-bold shadow-xl shadow-indigo-950/40 transition-all active:scale-95"
+              >
+                点击验证 (Submit)
+              </button>
+            ) : (
+              <button
+                id="btn-edit"
+                onClick={continueTraining}
+                className="flex-1 md:w-56 px-10 py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-lg text-sm font-bold shadow-xl shadow-emerald-950/20 transition-all active:scale-95"
+              >
+                继续修改 (Modify)
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 w-full md:w-auto items-center">
-          {isVerified && (
-            <div className="mr-4 flex flex-col items-end">
-              <span className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-widest">Score</span>
-              <span className="text-2xl font-black text-[#10B981] leading-none">{stats.percent}%</span>
+        {/* Usage Guide Section */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-[#334155]/50 text-[#94A3B8]">
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">1</div>
+            <div>
+              <h4 className="text-xs font-bold text-white mb-1">点选关系</h4>
+              <p className="text-[10px] leading-relaxed">点击网格中的任何单元格进行切换：一击为<span className="text-[#10B981]">克制 (○)</span>，再击为<span className="text-[#EF4444]">被克制 (△)</span>，三击回到普通倍数。</p>
             </div>
-          )}
-          <button
-            id="btn-reset"
-            onClick={resetAll}
-            className="flex-1 md:flex-none px-6 py-3 border border-[#334155] rounded-lg text-sm font-semibold text-[#94A3B8] hover:bg-[#334155] hover:text-white transition-all active:scale-95"
-          >
-            重置表格
-          </button>
-          
-          {isVerified && (
-            <button
-              id="btn-show-answers"
-              onClick={() => setShowAnswers(!showAnswers)}
-              className={`flex-1 md:flex-none px-6 py-3 border rounded-lg text-sm font-bold transition-all active:scale-95 shadow-lg ${
-                showAnswers 
-                ? 'bg-[#6366F1] border-[#818CF8] text-white shadow-indigo-500/20' 
-                : 'bg-[#1E293B] border-[#334155] text-[#94A3B8] hover:border-[#475569] hover:text-white'
-              }`}
-            >
-              {showAnswers ? '隐藏正确答案' : '查看正确答案'}
-            </button>
-          )}
-
-          {!isVerified ? (
-            <button
-              id="btn-verify"
-              onClick={verifyResults}
-              className="flex-1 md:w-56 px-10 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg text-sm font-bold shadow-xl shadow-indigo-950/40 transition-all active:scale-95"
-            >
-              点击验证 (Submit)
-            </button>
-          ) : (
-            <button
-              id="btn-edit"
-              onClick={continueTraining}
-              className="flex-1 md:w-56 px-10 py-3 bg-[#10B981] hover:bg-[#059669] text-white rounded-lg text-sm font-bold shadow-xl shadow-emerald-950/20 transition-all active:scale-95"
-            >
-              继续修改 (Modify)
-            </button>
-          )}
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">2</div>
+            <div>
+              <h4 className="text-xs font-bold text-white mb-1">提交验证</h4>
+              <p className="text-[10px] leading-relaxed">完成填写后，点击右下角<span className="text-white font-bold">【点击验证】</span>。系统会自动标记所有错误选项（以红色呼吸光效示警）。</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">3</div>
+            <div>
+              <h4 className="text-xs font-bold text-white mb-1">对照答案</h4>
+              <p className="text-[10px] leading-relaxed">验证后可点击<span className="text-white font-bold">【查看正确答案】</span>，对比自己的选择。若实际关系为“普通”则会显示文字提示。</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">4</div>
+            <div>
+              <h4 className="text-xs font-bold text-white mb-1">持续进阶</h4>
+              <p className="text-[10px] leading-relaxed">点击<span className="text-[#10B981] font-bold">继续修改</span>修正错误，或使用<span className="text-white font-bold">重置表格</span>重新开始，直至完成 324 个格位的全对大挑战！</p>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
