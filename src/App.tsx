@@ -24,6 +24,7 @@ export default function App() {
     Array(ATTRIBUTES.length).fill(null).map(() => Array(ATTRIBUTES.length).fill(Effectiveness.NORMAL))
   );
   const [isVerified, setIsVerified] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
 
   const toggleCell = useCallback((atkIdx: number, defIdx: number) => {
     if (isVerified) return;
@@ -152,15 +153,15 @@ export default function App() {
         {/* Matrix Area */}
         <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-hidden" id="matrix-container">
           <div className="absolute inset-0 overflow-auto scroll-smooth">
-            <table className="w-full border-collapse table-fixed min-w-[1100px]" id="matrix-table">
+            <table className="w-full border-collapse table-fixed min-w-[1200px]" id="matrix-table">
               <thead className="sticky top-0 z-30">
                 <tr>
-                  <th className="w-24 h-16 border-r border-b border-[#334155] bg-[#334155] sticky left-0 z-40">
+                  <th className="w-28 h-20 border-r border-b border-[#334155] bg-[#334155] sticky left-0 z-40">
                     <div className="relative w-full h-full overflow-hidden">
-                      <div className="absolute top-2 right-2 text-[9px] text-[#94A3B8] font-bold leading-none">
+                      <div className="absolute top-2 right-2 text-[10px] md:text-xs text-[#94A3B8] font-bold leading-none">
                         防御 (Def)
                       </div>
-                      <div className="absolute bottom-2 left-2 text-[9px] text-[#94A3B8] font-bold leading-none">
+                      <div className="absolute bottom-2 left-2 text-[10px] md:text-xs text-[#94A3B8] font-bold leading-none">
                         攻击 (Atk)
                       </div>
                       <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
@@ -171,10 +172,10 @@ export default function App() {
                   {ATTRIBUTES.map((attr) => {
                     const AttrIcon = IconMap[attr.iconName] || Circle;
                     return (
-                      <th key={`head-def-${attr.id}`} className="w-14 h-16 border-r border-b border-[#334155] bg-[#334155] p-1">
-                        <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex flex-col items-center justify-center gap-1">
-                          <AttrIcon size={14} color={attr.color} strokeWidth={2.5} />
-                          <span className="text-[10px] font-bold text-white uppercase leading-none">
+                      <th key={`head-def-${attr.id}`} className="w-16 h-20 border-r border-b border-[#334155] bg-[#334155] p-1">
+                        <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex flex-col items-center justify-center gap-1.5">
+                          <AttrIcon size={18} color={attr.color} strokeWidth={2.5} />
+                          <span className="text-xs md:text-sm font-bold text-white uppercase leading-none">
                             {attr.name}
                           </span>
                         </div>
@@ -186,11 +187,11 @@ export default function App() {
               <tbody>
                 {ATTRIBUTES.map((atkAttr, aIdx) => (
                   <tr key={`row-${atkAttr.id}`} className="group">
-                    <td className="w-24 h-10 border-r border-b border-[#334155] bg-[#334155] p-1 sticky left-0 z-20 group-hover:bg-[#475569] transition-colors">
-                      <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-between px-2 text-[10px] font-bold text-white uppercase">
+                    <td className="w-28 h-12 border-r border-b border-[#334155] bg-[#334155] p-1 sticky left-0 z-20 group-hover:bg-[#475569] transition-colors">
+                      <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-between px-3 text-xs md:text-sm font-bold text-white uppercase">
                         {(() => {
                           const AttrIcon = IconMap[atkAttr.iconName] || Circle;
-                          return <AttrIcon size={12} color={atkAttr.color} strokeWidth={2.5} />;
+                          return <AttrIcon size={14} color={atkAttr.color} strokeWidth={2.5} />;
                         })()}
                         <span>{atkAttr.name}</span>
                       </div>
@@ -206,7 +207,7 @@ export default function App() {
                           key={`${atkAttr.id}-${defAttr.id}`}
                           onClick={() => toggleCell(aIdx, dIdx)}
                           className={`
-                            h-10 border-r border-b border-[#334155] relative cursor-pointer
+                            h-12 border-r border-b border-[#334155] relative cursor-pointer
                             transition-all duration-150
                             ${isError ? 'bg-red-500/10 shadow-[inset_0_0_8px_rgba(239,68,68,0.3)]' : ''}
                             ${isCorrectFilled ? 'bg-emerald-500/5' : ''}
@@ -214,17 +215,35 @@ export default function App() {
                           `}
                         >
                           <div className="w-full h-full flex items-center justify-center pointer-events-none relative scale-[0.85]">
+                            {/* User Selected Icons */}
                             {userValue === Effectiveness.SUPER && (
                               <motion.div 
                                 initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                className="w-6 h-6 rounded-full border-[3px] border-[#10B981]" 
+                                className={`w-6 h-6 rounded-full border-[3px] border-[#10B981] ${showAnswers && trueEnum !== Effectiveness.SUPER ? 'opacity-30' : ''}`} 
                               />
                             )}
                             {userValue === Effectiveness.RESISTED && (
                               <motion.div 
                                 initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                className="w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-bottom border-b-[19px] border-b-[#EF4444]" 
+                                className={`w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-bottom border-b-[19px] border-b-[#EF4444] ${showAnswers && trueEnum !== Effectiveness.RESISTED ? 'opacity-30' : ''}`} 
                               />
+                            )}
+
+                            {/* Correct Answer Overlays (if showAnswers is ON) */}
+                            {showAnswers && trueEnum === Effectiveness.SUPER && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-full border-[4px] border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.6)] z-10" />
+                              </div>
+                            )}
+                            {showAnswers && trueEnum === Effectiveness.RESISTED && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-b-[24px] border-b-red-400 shadow-[0_5px_15px_rgba(248,113,113,0.4)] z-10" />
+                              </div>
+                            )}
+                            {showAnswers && trueEnum === Effectiveness.NORMAL && userValue !== Effectiveness.NORMAL && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-70">
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter bg-slate-800 px-1 rounded">NORMAL</div>
+                              </div>
                             )}
 
                             {/* Indicators */}
@@ -261,14 +280,29 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex gap-4 w-full md:w-auto">
+        <div className="flex flex-wrap gap-4 w-full md:w-auto">
           <button
             id="btn-reset"
             onClick={resetAll}
-            className="flex-1 md:flex-none px-8 py-3 border border-[#334155] rounded-lg text-sm font-semibold text-[#94A3B8] hover:bg-[#334155] hover:text-white transition-all active:scale-95"
+            className="flex-1 md:flex-none px-6 py-3 border border-[#334155] rounded-lg text-sm font-semibold text-[#94A3B8] hover:bg-[#334155] hover:text-white transition-all active:scale-95"
           >
             重置表格
           </button>
+          
+          {isVerified && (
+            <button
+              id="btn-show-answers"
+              onClick={() => setShowAnswers(!showAnswers)}
+              className={`flex-1 md:flex-none px-6 py-3 border rounded-lg text-sm font-bold transition-all active:scale-95 shadow-lg ${
+                showAnswers 
+                ? 'bg-[#6366F1] border-[#818CF8] text-white shadow-indigo-500/20' 
+                : 'bg-[#1E293B] border-[#334155] text-[#94A3B8] hover:border-[#475569] hover:text-white'
+              }`}
+            >
+              {showAnswers ? '隐藏正确答案' : '查看正确答案'}
+            </button>
+          )}
+
           {!isVerified ? (
             <button
               id="btn-verify"
