@@ -42,13 +42,16 @@ export default function App() {
     setIsVerified(true);
   };
 
-  const resetAll = () => {
-    if (confirm('确定要清除所有进度吗？')) {
-      setUserMatrix(Array(ATTRIBUTES.length).fill(null).map(() => Array(ATTRIBUTES.length).fill(Effectiveness.NORMAL)));
-      setIsVerified(false);
-      setShowAnswers(false);
-    }
-  };
+  const [resetCounter, setResetCounter] = useState(0);
+
+  const resetAll = useCallback(() => {
+    setUserMatrix(Array.from({ length: ATTRIBUTES.length }, () => 
+      new Array(ATTRIBUTES.length).fill(Effectiveness.NORMAL)
+    ));
+    setIsVerified(false);
+    setShowAnswers(false);
+    setResetCounter(prev => prev + 1);
+  }, []);
 
   const continueTraining = () => {
     setIsVerified(false);
@@ -88,7 +91,7 @@ export default function App() {
   }, [userMatrix]);
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-[#E2E8F0] font-sans flex flex-col" id="app-root">
+    <div className="h-screen bg-[#0F172A] text-[#E2E8F0] font-sans flex flex-col overflow-hidden" id="app-root">
       {/* Header */}
       <header className="flex items-center justify-between px-8 py-5 bg-[#1E293B] border-b border-[#334155] shadow-lg sticky top-0 z-50" id="main-header">
         <div className="flex items-center gap-4">
@@ -123,7 +126,7 @@ export default function App() {
         {/* Matrix Area */}
         <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-hidden mb-4" id="matrix-container">
           <div className="w-full h-full">
-            <table className="w-full h-full border-collapse table-fixed select-none" id="matrix-table">
+            <table key={resetCounter} className="w-full h-full border-collapse table-fixed select-none" id="matrix-table">
               <thead>
                 <tr className="h-[5.26%]">
                   <th className="w-[8%] border-r border-b border-[#334155] bg-[#334155] relative">
