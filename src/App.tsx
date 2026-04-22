@@ -153,29 +153,29 @@ export default function App() {
         {/* Matrix Area */}
         <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-hidden" id="matrix-container">
           <div className="absolute inset-0 overflow-auto scroll-smooth">
-            <table className="w-full border-collapse table-fixed min-w-[1200px]" id="matrix-table">
+            <table className="w-full border-collapse table-fixed min-w-[1400px] 2xl:min-w-[2600px]" id="matrix-table">
               <thead className="sticky top-0 z-30">
                 <tr>
-                  <th className="w-28 h-20 border-r border-b border-[#334155] bg-[#334155] sticky left-0 z-40">
+                  <th className="w-40 h-24 2xl:w-60 2xl:h-40 border-r border-b border-[#334155] bg-[#334155] sticky left-0 z-40">
                     <div className="relative w-full h-full overflow-hidden">
-                      <div className="absolute top-2 right-2 text-[10px] md:text-xs text-[#94A3B8] font-bold leading-none">
+                      <div className="absolute top-2 right-2 2xl:top-4 2xl:right-4 text-xs 2xl:text-xl text-[#94A3B8] font-bold leading-none">
                         防御 (Def)
                       </div>
-                      <div className="absolute bottom-2 left-2 text-[10px] md:text-xs text-[#94A3B8] font-bold leading-none">
+                      <div className="absolute bottom-2 left-2 2xl:bottom-4 2xl:left-4 text-xs 2xl:text-xl text-[#94A3B8] font-bold leading-none">
                         攻击 (Atk)
                       </div>
                       <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
-                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="#475569" strokeWidth="1" />
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="#475569" strokeWidth="2" />
                       </svg>
                     </div>
                   </th>
                   {ATTRIBUTES.map((attr) => {
                     const AttrIcon = IconMap[attr.iconName] || Circle;
                     return (
-                      <th key={`head-def-${attr.id}`} className="w-16 h-20 border-r border-b border-[#334155] bg-[#334155] p-1">
-                        <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex flex-col items-center justify-center gap-1.5">
-                          <AttrIcon size={18} color={attr.color} strokeWidth={2.5} />
-                          <span className="text-xs md:text-sm font-bold text-white uppercase leading-none">
+                      <th key={`head-def-${attr.id}`} className="w-20 h-24 2xl:w-36 2xl:h-40 border-r border-b border-[#334155] bg-[#334155] p-1 2xl:p-2">
+                        <div className="w-full h-full rounded-lg 2xl:rounded-xl bg-[#0F172A] border border-[#334155] flex flex-col items-center justify-center gap-1.5 2xl:gap-3">
+                          <AttrIcon className="w-7 h-7 2xl:w-12 2xl:h-12" color={attr.color} strokeWidth={2.5} />
+                          <span className="text-sm 2xl:text-3xl font-black text-white uppercase leading-none tracking-widest">
                             {attr.name}
                           </span>
                         </div>
@@ -187,13 +187,13 @@ export default function App() {
               <tbody>
                 {ATTRIBUTES.map((atkAttr, aIdx) => (
                   <tr key={`row-${atkAttr.id}`} className="group">
-                    <td className="w-28 h-12 border-r border-b border-[#334155] bg-[#334155] p-1 sticky left-0 z-20 group-hover:bg-[#475569] transition-colors">
-                      <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-between px-3 text-xs md:text-sm font-bold text-white uppercase">
+                    <td className="w-40 h-16 2xl:w-60 2xl:h-32 border-r border-b border-[#334155] bg-[#334155] p-1 2xl:p-2 sticky left-0 z-20 group-hover:bg-[#475569] transition-colors">
+                      <div className="w-full h-full rounded-lg 2xl:rounded-xl bg-[#0F172A] border border-[#334155] flex items-center justify-between px-3 2xl:px-6 text-sm 2xl:text-2xl font-black text-white uppercase">
                         {(() => {
                           const AttrIcon = IconMap[atkAttr.iconName] || Circle;
-                          return <AttrIcon size={14} color={atkAttr.color} strokeWidth={2.5} />;
+                          return <AttrIcon className="w-6 h-6 2xl:w-9 2xl:h-9" color={atkAttr.color} strokeWidth={2.5} />;
                         })()}
-                        <span>{atkAttr.name}</span>
+                        <span className="ml-2 2xl:ml-4">{atkAttr.name}</span>
                       </div>
                     </td>
                     {ATTRIBUTES.map((defAttr, dIdx) => {
@@ -207,42 +207,42 @@ export default function App() {
                           key={`${atkAttr.id}-${defAttr.id}`}
                           onClick={() => toggleCell(aIdx, dIdx)}
                           className={`
-                            h-12 border-r border-b border-[#334155] relative cursor-pointer
+                            h-16 2xl:h-32 border-r border-b border-[#334155] relative cursor-pointer
                             transition-all duration-150
                             ${isError ? 'bg-red-500/10 shadow-[inset_0_0_8px_rgba(239,68,68,0.3)]' : ''}
                             ${isCorrectFilled ? 'bg-emerald-500/5' : ''}
                             hover:bg-[#334155]
                           `}
                         >
-                          <div className="w-full h-full flex items-center justify-center pointer-events-none relative scale-[0.85]">
+                          <div className="w-full h-full flex items-center justify-center pointer-events-none relative scale-[0.85] 2xl:scale-[1.3]">
                             {/* User Selected Icons */}
                             {userValue === Effectiveness.SUPER && (
                               <motion.div 
                                 initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                className={`w-6 h-6 rounded-full border-[3px] border-[#10B981] ${showAnswers && trueEnum !== Effectiveness.SUPER ? 'opacity-30' : ''}`} 
+                                className={`w-9 h-9 2xl:w-16 2xl:h-16 rounded-full border-[3px] 2xl:border-[8px] border-[#10B981] ${showAnswers && trueEnum !== Effectiveness.SUPER ? 'opacity-30' : ''}`} 
                               />
                             )}
                             {userValue === Effectiveness.RESISTED && (
                               <motion.div 
                                 initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                className={`w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-bottom border-b-[19px] border-b-[#EF4444] ${showAnswers && trueEnum !== Effectiveness.RESISTED ? 'opacity-30' : ''}`} 
+                                className={`w-0 h-0 border-l-[14px] border-r-[14px] border-b-[24px] 2xl:border-l-[28px] 2xl:border-r-[28px] 2xl:border-bottom 2xl:border-b-[48px] border-b-[#EF4444] ${showAnswers && trueEnum !== Effectiveness.RESISTED ? 'opacity-30' : ''}`} 
                               />
                             )}
 
                             {/* Correct Answer Overlays (if showAnswers is ON) */}
                             {showAnswers && trueEnum === Effectiveness.SUPER && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-8 h-8 rounded-full border-[4px] border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.6)] z-10" />
+                                <div className="w-12 h-12 2xl:w-24 2xl:h-24 rounded-full border-[4px] 2xl:border-[10px] border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.7)] 2xl:shadow-[0_0_35px_rgba(52,211,153,0.9)] z-10" />
                               </div>
                             )}
                             {showAnswers && trueEnum === Effectiveness.RESISTED && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-b-[24px] border-b-red-400 shadow-[0_5px_15px_rgba(248,113,113,0.4)] z-10" />
+                                <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-b-[34px] 2xl:border-l-[36px] 2xl:border-r-[36px] 2xl:border-b-[64px] border-b-red-400 shadow-[0_10px_25px_rgba(248,113,113,0.6)] 2xl:shadow-[0_15px_35px_rgba(248,113,113,0.8)] z-10" />
                               </div>
                             )}
                             {showAnswers && trueEnum === Effectiveness.NORMAL && userValue !== Effectiveness.NORMAL && (
                               <div className="absolute inset-0 flex items-center justify-center opacity-70">
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter bg-slate-800 px-1 rounded">NORMAL</div>
+                                <div className="text-[10px] 2xl:text-2xl font-black text-slate-400 uppercase bg-slate-800 px-1.5 py-0.5 2xl:px-4 2xl:py-1 rounded 2xl:rounded-xl border 2xl:border-2 border-slate-700">NORMAL</div>
                               </div>
                             )}
 
