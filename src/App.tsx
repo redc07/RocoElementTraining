@@ -7,7 +7,16 @@ import { useState, useCallback, useMemo } from 'react';
 import { ATTRIBUTES, EFFECTIVENESS_MATRIX } from './constants';
 import { Effectiveness } from './types';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, RotateCcw, Info, Check, X, Trophy, AlertTriangle } from 'lucide-react';
+import * as Icons from 'lucide-react';
+
+const { 
+  CheckCircle2, RotateCcw, Info, Check, X, Trophy, AlertTriangle,
+  Circle, Leaf, Flame, Droplets, Sun, Mountain, Snowflake, Zap, Atom, Bug, Hand, Feather, Heart, Ghost, Moon, Settings, Disc 
+} = Icons;
+
+const IconMap: Record<string, any> = {
+  Circle, Leaf, Flame, Droplets, Sun, Mountain, Snowflake, Zap, Atom, Bug, Hand, Feather, Heart, Ghost, Moon, Settings, Disc 
+};
 
 export default function App() {
   // state[atkIndex][defIndex] stores the user's selected effectiveness
@@ -146,28 +155,44 @@ export default function App() {
             <table className="w-full border-collapse table-fixed min-w-[1100px]" id="matrix-table">
               <thead className="sticky top-0 z-30">
                 <tr>
-                  <th className="w-20 h-10 border-r border-b border-[#334155] bg-[#334155] sticky left-0 z-40">
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-[9px] text-[#94A3B8] uppercase font-bold transform -rotate-12">
-                        Atk/Def
+                  <th className="w-24 h-16 border-r border-b border-[#334155] bg-[#334155] sticky left-0 z-40">
+                    <div className="relative w-full h-full overflow-hidden">
+                      <div className="absolute top-2 right-2 text-[9px] text-[#94A3B8] font-bold leading-none">
+                        防御 (Def)
                       </div>
+                      <div className="absolute bottom-2 left-2 text-[9px] text-[#94A3B8] font-bold leading-none">
+                        攻击 (Atk)
+                      </div>
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="#475569" strokeWidth="1" />
+                      </svg>
                     </div>
                   </th>
-                  {ATTRIBUTES.map((attr) => (
-                    <th key={`head-def-${attr.id}`} className="w-14 h-10 border-r border-b border-[#334155] bg-[#334155] p-1">
-                      <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-center text-[10px] font-bold text-white uppercase">
-                        {attr.name}
-                      </div>
-                    </th>
-                  ))}
+                  {ATTRIBUTES.map((attr) => {
+                    const AttrIcon = IconMap[attr.iconName] || Circle;
+                    return (
+                      <th key={`head-def-${attr.id}`} className="w-14 h-16 border-r border-b border-[#334155] bg-[#334155] p-1">
+                        <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex flex-col items-center justify-center gap-1">
+                          <AttrIcon size={14} color={attr.color} strokeWidth={2.5} />
+                          <span className="text-[10px] font-bold text-white uppercase leading-none">
+                            {attr.name}
+                          </span>
+                        </div>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
                 {ATTRIBUTES.map((atkAttr, aIdx) => (
                   <tr key={`row-${atkAttr.id}`} className="group">
-                    <td className="w-20 h-10 border-r border-b border-[#334155] bg-[#334155] p-1 sticky left-0 z-20 group-hover:bg-[#475569] transition-colors">
-                      <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-center text-[10px] font-bold text-white uppercase">
-                        {atkAttr.name}
+                    <td className="w-24 h-10 border-r border-b border-[#334155] bg-[#334155] p-1 sticky left-0 z-20 group-hover:bg-[#475569] transition-colors">
+                      <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-between px-2 text-[10px] font-bold text-white uppercase">
+                        {(() => {
+                          const AttrIcon = IconMap[atkAttr.iconName] || Circle;
+                          return <AttrIcon size={12} color={atkAttr.color} strokeWidth={2.5} />;
+                        })()}
+                        <span>{atkAttr.name}</span>
                       </div>
                     </td>
                     {ATTRIBUTES.map((defAttr, dIdx) => {

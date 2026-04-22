@@ -9,6 +9,7 @@ export interface Attribute {
   name: string;
   color: string;
   bgColor: string;
+  iconName: string;
 }
 
 export type Matrix = number[][];
