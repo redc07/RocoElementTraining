@@ -13,7 +13,8 @@ import { saveAs } from 'file-saver';
 
 const { 
   CheckCircle2, RotateCcw, Info, Check, X, Trophy, AlertTriangle,
-  Circle, Leaf, Flame, Droplets, Sun, Mountain, Snowflake, Zap, Atom, Bug, Hand, Feather, Heart, Ghost, Moon, Settings, Disc 
+  Circle, Leaf, Flame, Droplets, Sun, Mountain, Snowflake, Zap, Atom, Bug, Hand, Feather, Heart, Ghost, Moon, Settings, Disc,
+  Github, ExternalLink
 } = Icons;
 
 const IconMap: Record<string, any> = {
@@ -32,6 +33,9 @@ export default function App() {
   const [showToast, setShowToast] = useState(false);
   const [showFillConfirm, setShowFillConfirm] = useState(false);
   const [isAutoFilled, setIsAutoFilled] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [hoveredCol, setHoveredCol] = useState<number | null>(null);
 
   const toggleCell = useCallback((atkIdx: number, defIdx: number) => {
     if (isVerified || isAutoFilled) return;
@@ -325,19 +329,99 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* About Modal */}
+      <AnimatePresence>
+        {showAbout && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+            onClick={() => setShowAbout(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-[#1E293B] border border-[#334155] rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl relative"
+              onClick={e => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setShowAbout(false)}
+                className="absolute top-4 right-4 text-[#94A3B8] hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+              
+              <div className="w-16 h-16 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-[#4F46E5] mx-auto mb-6">
+                <Info size={32} />
+              </div>
+              
+              <h3 className="text-xl font-bold text-white mb-4 text-center">关于本系统</h3>
+              
+              <div className="space-y-4 text-sm text-[#94A3B8] leading-relaxed">
+                <p>
+                  专为《洛克王国·世界》玩家设计的属性克制训练工具，可检验你对18种属性间克制关系的掌握程度，并支持导出错题数据。
+                </p>
+                
+                <div className="pt-4 border-t border-[#334155]">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-300">
+                      <Icons.User size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#64748B]">开发者 / 反馈联系</p>
+                      <p className="text-white font-medium">天和谦信 (QQ: 524254767)</p>
+                    </div>
+                  </div>
+                  
+                  <a 
+                    href="https://github.com/redc07/RocoElementTraining" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 bg-slate-900/50 hover:bg-slate-900 rounded-xl border border-[#334155] transition-all group"
+                  >
+                    <Github size={18} className="text-white" />
+                    <div className="flex-1">
+                      <p className="text-xs text-[#64748B]">开源项目地址（帮我打🌟，求求了！）</p>
+                      <p className="text-white font-medium group-hover:text-[#6366F1] transition-colors">GitHub Repository</p>
+                    </div>
+                    <ExternalLink size={14} className="text-[#475569]" />
+                  </a>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setShowAbout(false)}
+                className="w-full mt-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-950/20"
+              >
+                了解
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="flex items-center justify-between px-4 md:px-6 py-2 bg-[#1E293B] border-b border-[#334155] shadow-lg sticky top-0 z-50 shrink-0" id="main-header">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="w-6 h-6 md:w-8 md:h-8 bg-[#4F46E5] rounded flex items-center justify-center font-bold text-base md:text-lg text-white shadow-lg">
             R
           </div>
-          <div>
-            <h1 className="text-sm md:text-base font-bold tracking-tight text-white uppercase whitespace-nowrap" id="app-title">
-              洛克王国世界属性训练系统
-            </h1>
-            <p className="hidden xs:block text-[6px] md:text-[8px] text-[#94A3B8] font-mono tracking-widest leading-none">
-              MASTER ATTRIBUTE COUNTER TABLE V1.0
-            </p>
+          <div className="flex items-center gap-2">
+            <div>
+              <h1 className="text-sm md:text-base font-bold tracking-tight text-white uppercase whitespace-nowrap" id="app-title">
+                洛克王国·世界属性训练系统
+              </h1>
+              <p className="text-[6px] md:text-[8px] text-[#94A3B8] font-mono tracking-widest leading-none">
+                Roco Kingdom:World Attribute Training V1.0
+              </p>
+            </div>
+            <button 
+              onClick={() => setShowAbout(true)}
+              className="p-1.5 text-[#94A3B8] hover:text-white hover:bg-[#334155] rounded-full transition-all"
+              title="关于"
+            >
+              <Info size={18} />
+            </button>
           </div>
         </div>
         <div className="flex gap-3 md:gap-6 text-[10px] md:text-xs">
@@ -356,30 +440,31 @@ export default function App() {
       <main className="flex-1 p-2 md:p-3 flex flex-col gap-2 md:gap-3 min-h-0 overflow-hidden">
         {/* Matrix Area */}
         <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-auto custom-scrollbar" id="matrix-container">
-          <div className="w-full h-full min-w-[1000px] md:min-w-[1200px] min-h-[500px]">
+          <div className="w-full h-full lg:min-w-0 min-w-[800px] min-h-[500px]">
             <table key={resetCounter} className="w-full min-h-full border-collapse table-fixed select-none" id="matrix-table">
               <thead>
-                <tr className="h-10 md:h-12 lg:h-[5.26%]">
-                  <th className="w-[8%] border-r border-b border-[#334155] bg-[#334155] relative overflow-hidden">
+                <tr className="h-13 md:h-16 lg:h-[6.8%] sticky top-0 z-40">
+                  <th className="w-[8%] border-r border-b border-[#334155] bg-[#020617] relative overflow-hidden sticky left-0 z-50">
                     <div className="absolute inset-0 z-0 pointer-events-none">
                       <svg className="w-full h-full" preserveAspectRatio="none">
                         <line x1="0" y1="0" x2="100%" y2="100%" stroke="#475569" strokeWidth="1.5" />
                       </svg>
                     </div>
                     <div className="absolute top-[8%] right-[8%] text-[clamp(11px,0.8vw,16px)] text-white/90 font-black leading-none z-10 pointer-events-none">
-                      防御
+                      防御方
                     </div>
                     <div className="absolute bottom-[8%] left-[8%] text-[clamp(11px,0.8vw,16px)] text-white/90 font-black leading-none z-10 pointer-events-none">
-                      攻击
+                      攻击方
                     </div>
                   </th>
-                  {ATTRIBUTES.map((attr) => {
+                  {ATTRIBUTES.map((attr, dIdx) => {
                     const AttrIcon = IconMap[attr.iconName] || Circle;
+                    const isHovered = hoveredCol === dIdx;
                     return (
-                      <th key={`head-def-${attr.id}`} className="border-r border-b border-[#334155] bg-[#334155] p-0.5">
-                        <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex flex-col items-center justify-center">
-                          <AttrIcon className="w-[45%] h-[45%] mb-[2%]" color={attr.color} strokeWidth={2.5} />
-                          <span className="text-[clamp(12px,1.2vw,32px)] font-black text-white uppercase leading-none">
+                      <th key={`head-def-${attr.id}`} className="border-r border-b border-[#334155] bg-[#020617] p-0.5 sticky top-0">
+                        <div className={`w-full h-full transition-colors duration-75 flex flex-col items-center justify-center ${isHovered ? 'bg-[#4F46E5] z-10' : 'bg-transparent text-white'}`}>
+                          <AttrIcon className="w-[45%] h-[45%] mb-[2%]" color={isHovered ? '#FFFFFF' : attr.color} strokeWidth={2.5} />
+                          <span className="text-[clamp(12px,1.2vw,32px)] font-black uppercase leading-none">
                             {attr.name}
                           </span>
                         </div>
@@ -389,28 +474,38 @@ export default function App() {
                 </tr>
               </thead>
               <tbody className="h-auto">
-                {ATTRIBUTES.map((atkAttr, aIdx) => (
-                  <tr key={`row-${atkAttr.id}`} className="h-10 md:h-12 lg:h-[5.26%] group">
-                    <td className="border-r border-b border-[#334155] bg-[#334155] p-0.5 group-hover:bg-[#475569] transition-colors relative">
-                      <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-center md:justify-between px-[10%] text-[clamp(12px,1.2vw,32px)] font-black text-white uppercase overflow-hidden">
-                        {(() => {
-                          const AttrIcon = IconMap[atkAttr.iconName] || Circle;
-                          return <AttrIcon className="w-[clamp(16px,1.8vw,48px)] h-[clamp(16px,1.8vw,48px)]" color={atkAttr.color} strokeWidth={2.5} />;
-                        })()}
-                        <span className="hidden md:inline">{atkAttr.name}</span>
-                      </div>
-                    </td>
-                    {ATTRIBUTES.map((defAttr, dIdx) => {
-                      const { userValue, trueEnum, isCorrect } = getCellStatus(aIdx, dIdx);
-                      const isError = isVerified && !isCorrect;
-                      const isCorrectFilled = isVerified && isCorrect && userValue !== Effectiveness.NORMAL;
+                {ATTRIBUTES.map((atkAttr, aIdx) => {
+                  const isHoveredRow = hoveredRow === aIdx;
+                  return (
+                    <tr key={`row-${atkAttr.id}`} className="h-10 md:h-12 lg:h-[5.26%] group">
+                      <td className="border-r border-b border-[#334155] bg-[#020617] p-0.5 group-hover:bg-[#475569] transition-colors relative sticky left-0 z-30">
+                        <div className={`w-full h-full transition-colors duration-75 flex items-center justify-center md:justify-between px-[10%] text-[clamp(12px,1.2vw,32px)] font-black uppercase overflow-hidden ${isHoveredRow ? 'bg-[#4F46E5] text-white z-10' : 'bg-transparent text-white'}`}>
+                          {(() => {
+                            const AttrIcon = IconMap[atkAttr.iconName] || Circle;
+                            return <AttrIcon className="w-[clamp(16px,1.8vw,48px)] h-[clamp(16px,1.8vw,48px)]" color={isHoveredRow ? '#FFFFFF' : atkAttr.color} strokeWidth={2.5} />;
+                          })()}
+                          <span className="hidden md:inline">{atkAttr.name}</span>
+                        </div>
+                      </td>
+                      {ATTRIBUTES.map((defAttr, dIdx) => {
+                        const { userValue, trueEnum, isCorrect } = getCellStatus(aIdx, dIdx);
+                        const isError = isVerified && !isCorrect;
+                        const isCorrectFilled = isVerified && isCorrect && userValue !== Effectiveness.NORMAL;
 
-                      return (
-                        <td 
-                          id={`cell-${atkAttr.id}-${defAttr.id}`}
-                          key={`${atkAttr.id}-${defAttr.id}`}
-                          onClick={() => toggleCell(aIdx, dIdx)}
-                          className={`
+                        return (
+                          <td 
+                            id={`cell-${atkAttr.id}-${defAttr.id}`}
+                            key={`${atkAttr.id}-${defAttr.id}`}
+                            onClick={() => toggleCell(aIdx, dIdx)}
+                            onMouseEnter={() => {
+                              setHoveredRow(aIdx);
+                              setHoveredCol(dIdx);
+                            }}
+                            onMouseLeave={() => {
+                              setHoveredRow(null);
+                              setHoveredCol(null);
+                            }}
+                            className={`
                             border-r border-b border-[#334155] relative overflow-hidden
                             transition-all duration-150
                             ${(isVerified || isAutoFilled) ? 'cursor-default' : 'cursor-pointer hover:bg-[#334155]'}
@@ -483,7 +578,8 @@ export default function App() {
                       );
                     })}
                   </tr>
-                ))}
+                );
+              })}
               </tbody>
             </table>
           </div>
@@ -524,7 +620,7 @@ export default function App() {
               }`}
             >
               <Icons.Zap size={14} />
-              <span className="whitespace-nowrap">自动填入</span>
+              <span className="whitespace-nowrap">填入全部正确答案</span>
             </button>
 
             <button
@@ -584,13 +680,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* Usage Guide Section - Hidden on mobile/tablet, visible on large screens */}
-        <div className="hidden lg:grid grid-cols-4 gap-4 pt-4 border-t border-[#334155]/50 text-[#94A3B8]">
+        {/* Usage Guide Section - Visible from sm up */}
+        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-[#334155]/50 text-[#94A3B8]">
           <div className="flex gap-3">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">1</div>
             <div>
               <h4 className="text-xs font-bold text-white mb-1">点选关系</h4>
-              <p className="text-[10px] leading-relaxed">点击网格中的任何单元格进行切换：一击为<span className="text-[#10B981]">克制 (○)</span>，再击为<span className="text-[#EF4444]">被克制 (△)</span>，三击回到普通倍数。</p>
+              <p className="text-[10px] leading-relaxed">点击网格中的任何单元格进行切换：一击为<span className="text-[#10B981]">克制 (○)</span>，再击为<span className="text-[#EF4444]">被克制 (▽)</span>，三击回到普通倍数。</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -604,14 +700,14 @@ export default function App() {
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">3</div>
             <div>
               <h4 className="text-xs font-bold text-white mb-1">对照答案</h4>
-              <p className="text-[10px] leading-relaxed">验证后可点击<span className="text-white font-bold">【查看正确答案】</span>，对比自己的选择。若实际关系为“普通”则会显示文字提示。</p>
+              <p className="text-[10px] leading-relaxed">验证后可点击<span className="text-white font-bold">【查看答案】</span>，对比自己的选择。若实际关系为“普通”则会显示文字提示。</p>
             </div>
           </div>
           <div className="flex gap-3">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">4</div>
             <div>
               <h4 className="text-xs font-bold text-white mb-1">持续进阶</h4>
-              <p className="text-[10px] leading-relaxed">点击<span className="text-[#10B981] font-bold">继续修改</span>修正错误，或使用<span className="text-white font-bold">重置表格</span>重新开始，直至完成 324 个格点的全对大挑战！</p>
+              <p className="text-[10px] leading-relaxed">点击<span className="text-[#10B981] font-bold">【继续修改】</span>修正错误，或使用<span className="text-white font-bold">【重置表格】</span>重新开始，直至完成 324 个格点的全对大挑战！</p>
             </div>
           </div>
         </div>
