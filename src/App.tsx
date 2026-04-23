@@ -30,9 +30,11 @@ export default function App() {
   const [showMistakes, setShowMistakes] = useState(false);
   const [showRank, setShowRank] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [showFillConfirm, setShowFillConfirm] = useState(false);
+  const [isAutoFilled, setIsAutoFilled] = useState(false);
 
   const toggleCell = useCallback((atkIdx: number, defIdx: number) => {
-    if (isVerified) return;
+    if (isVerified || isAutoFilled) return;
     
     setUserMatrix(prev => {
       const next = [...prev.map(row => [...row])];
@@ -41,7 +43,7 @@ export default function App() {
       next[atkIdx][defIdx] = (current + 1) % 3 as Effectiveness;
       return next;
     });
-  }, [isVerified]);
+  }, [isVerified, isAutoFilled]);
 
   const verifyResults = () => {
     setIsVerified(true);
@@ -56,8 +58,23 @@ export default function App() {
     ));
     setIsVerified(false);
     setShowAnswers(false);
+    setIsAutoFilled(false);
     setResetCounter(prev => prev + 1);
   }, []);
+
+  const fillCorrectAnswers = () => {
+    const newMatrix = Array(ATTRIBUTES.length).fill(null).map((_, aIdx) => 
+      Array(ATTRIBUTES.length).fill(null).map((_, dIdx) => {
+        const val = EFFECTIVENESS_MATRIX[aIdx][dIdx];
+        if (val > 1) return Effectiveness.SUPER;
+        if (val < 1) return Effectiveness.RESISTED;
+        return Effectiveness.NORMAL;
+      })
+    );
+    setUserMatrix(newMatrix);
+    setIsAutoFilled(true);
+    setShowFillConfirm(false);
+  };
 
   const continueTraining = () => {
     setIsVerified(false);
@@ -138,6 +155,8 @@ export default function App() {
       console.error('Failed to copy: ', err);
     });
   };
+
+  const toastMessage = "🎉 分享链接已复制到剪贴板，快去分享吧！";
 
   const exportMistakesToExcel = async () => {
     if (mistakesList.length === 0) return;
@@ -225,7 +244,7 @@ export default function App() {
     });
 
     // 4. Adjust Column Widths
-    worksheet.getColumn(1).width = 8;
+    worksheet.getColumn(1).width = 12;
     worksheet.getColumn(2).width = 18;
     worksheet.getColumn(3).width = 18;
     worksheet.getColumn(4).width = 22;
@@ -257,8 +276,51 @@ export default function App() {
           >
             <div className="bg-[#10B981] text-white px-6 py-3 rounded-full shadow-2xl shadow-emerald-500/30 flex items-center gap-3 border border-emerald-400/50 backdrop-blur-sm">
               <Icons.CheckCircle2 size={18} />
-              <span className="text-sm font-bold tracking-wide">🎉 分享链接已复制到剪贴板，快去分享吧！</span>
+              <span className="text-sm font-bold tracking-wide">{toastMessage}</span>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Fill Answers Confirm Modal */}
+      <AnimatePresence>
+        {showFillConfirm && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowFillConfirm(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#1E293B] w-full max-w-sm rounded-2xl border border-[#334155] shadow-2xl p-6 text-center"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 mx-auto mb-4">
+                <AlertTriangle size={32} />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">确定要填入正确答案吗？</h3>
+              <p className="text-sm text-[#94A3B8] leading-relaxed mb-6">
+                这将覆盖您当前的所有填写。自动填入后将无法进行验证评分。
+              </p>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowFillConfirm(false)}
+                  className="flex-1 py-3 bg-[#334155] hover:bg-[#475569] text-white rounded-xl font-bold transition-all"
+                >
+                  取消
+                </button>
+                <button 
+                  onClick={fillCorrectAnswers}
+                  className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition-all"
+                >
+                  确定填入
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -293,8 +355,8 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 p-3 flex flex-col gap-3 min-h-0 overflow-hidden">
         {/* Matrix Area */}
-        <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-hidden" id="matrix-container">
-          <div className="w-full h-full">
+        <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-auto custom-scrollbar" id="matrix-container">
+          <div className="w-full h-full min-h-[600px] min-w-[800px]">
             <table key={resetCounter} className="w-full h-full border-collapse table-fixed select-none" id="matrix-table">
               <thead>
                 <tr className="h-[5.26%]">
@@ -349,11 +411,11 @@ export default function App() {
                           key={`${atkAttr.id}-${defAttr.id}`}
                           onClick={() => toggleCell(aIdx, dIdx)}
                           className={`
-                            border-r border-b border-[#334155] relative cursor-pointer overflow-hidden
+                            border-r border-b border-[#334155] relative overflow-hidden
                             transition-all duration-150
+                            ${(isVerified || isAutoFilled) ? 'cursor-default' : 'cursor-pointer hover:bg-[#334155]'}
                             ${isError ? 'bg-red-500/10 shadow-[inset_0_0_8px_rgba(239,68,68,0.3)]' : ''}
                             ${isCorrectFilled ? 'bg-emerald-500/5' : ''}
-                            hover:bg-[#334155]
                           `}
                         >
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -445,6 +507,27 @@ export default function App() {
               </div>
             )}
             <button
+              id="btn-auto-fill"
+              onClick={() => {
+                if (isVerified || isAutoFilled) return;
+                if (stats.attempted === 0) {
+                  fillCorrectAnswers();
+                } else {
+                  setShowFillConfirm(true);
+                }
+              }}
+              disabled={isVerified || isAutoFilled}
+              className={`flex-1 md:flex-none px-6 py-2 border rounded-lg text-sm font-semibold transition-all active:scale-95 flex items-center gap-2 ${
+                isVerified || isAutoFilled 
+                ? 'opacity-30 cursor-not-allowed border-[#334155] text-[#475569]' 
+                : 'border-amber-500/50 text-amber-500 hover:bg-amber-500/10'
+              }`}
+            >
+              <Icons.Zap size={14} />
+              填入全部正确答案
+            </button>
+
+            <button
               id="btn-reset"
               onClick={resetAll}
               className="flex-1 md:flex-none px-6 py-2 border border-[#334155] rounded-lg text-sm font-semibold text-[#94A3B8] hover:bg-[#334155] hover:text-white transition-all active:scale-95"
@@ -480,7 +563,12 @@ export default function App() {
               <button
                 id="btn-verify"
                 onClick={verifyResults}
-                className="flex-1 md:w-56 px-10 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg text-sm font-bold shadow-xl shadow-indigo-950/40 transition-all active:scale-95"
+                disabled={isAutoFilled}
+                className={`flex-1 md:w-56 px-10 py-2 rounded-lg text-sm font-bold shadow-xl transition-all active:scale-95 ${
+                  isAutoFilled 
+                  ? 'bg-slate-700 text-slate-500 cursor-not-allowed shadow-none' 
+                  : 'bg-[#4F46E5] hover:bg-[#4338CA] text-white shadow-indigo-950/40'
+                }`}
               >
                 点击验证 (Submit)
               </button>
