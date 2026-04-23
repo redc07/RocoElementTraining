@@ -326,51 +326,51 @@ export default function App() {
       </AnimatePresence>
 
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-2 bg-[#1E293B] border-b border-[#334155] shadow-lg sticky top-0 z-50 shrink-0" id="main-header">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#4F46E5] rounded flex items-center justify-center font-bold text-lg text-white shadow-lg">
+      <header className="flex items-center justify-between px-4 md:px-6 py-2 bg-[#1E293B] border-b border-[#334155] shadow-lg sticky top-0 z-50 shrink-0" id="main-header">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-6 h-6 md:w-8 md:h-8 bg-[#4F46E5] rounded flex items-center justify-center font-bold text-base md:text-lg text-white shadow-lg">
             R
           </div>
           <div>
-            <h1 className="text-base font-bold tracking-tight text-white uppercase" id="app-title">
-              洛克王国世界·属性克制训练系统
+            <h1 className="text-sm md:text-base font-bold tracking-tight text-white uppercase whitespace-nowrap" id="app-title">
+              洛克王国世界属性训练系统
             </h1>
-            <p className="text-[8px] text-[#94A3B8] font-mono tracking-widest leading-none">
+            <p className="hidden xs:block text-[6px] md:text-[8px] text-[#94A3B8] font-mono tracking-widest leading-none">
               MASTER ATTRIBUTE COUNTER TABLE V1.0
             </p>
           </div>
         </div>
-        <div className="hidden md:flex gap-6 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full border-2 border-[#10B981]" />
-            <span className="text-[#94A3B8] font-medium">克制 (○)</span>
+        <div className="flex gap-3 md:gap-6 text-[10px] md:text-xs">
+          <div className="flex items-center gap-1 md:gap-2">
+            <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-[#10B981]" />
+            <span className="text-[#94A3B8] font-medium">克制</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-[#EF4444]" />
-            <span className="text-[#94A3B8] font-medium">被克制 (▽)</span>
+          <div className="flex items-center gap-1 md:gap-2">
+            <div className="w-0 h-0 border-l-[4px] md:border-l-[6px] border-l-transparent border-r-[4px] md:border-r-[6px] border-r-transparent border-t-[7px] md:border-t-[10px] border-t-[#EF4444]" />
+            <span className="text-[#94A3B8] font-medium">被克制</span>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-3 flex flex-col gap-3 min-h-0 overflow-hidden">
+      <main className="flex-1 p-2 md:p-3 flex flex-col gap-2 md:gap-3 min-h-0 overflow-hidden">
         {/* Matrix Area */}
         <div className="flex-1 relative bg-[#1E293B] rounded-xl border border-[#334155] shadow-2xl overflow-auto custom-scrollbar" id="matrix-container">
-          <div className="w-full h-full min-h-[600px] min-w-[800px]">
-            <table key={resetCounter} className="w-full h-full border-collapse table-fixed select-none" id="matrix-table">
+          <div className="w-full h-full min-w-[1000px] md:min-w-[1200px] min-h-[500px]">
+            <table key={resetCounter} className="w-full min-h-full border-collapse table-fixed select-none" id="matrix-table">
               <thead>
-                <tr className="h-[5.26%]">
-                  <th className="w-[8%] border-r border-b border-[#334155] bg-[#334155] relative">
-                    <div className="w-full h-full relative overflow-hidden">
-                      <div className="absolute top-[15%] right-[10%] text-[clamp(10px,0.7vw,20px)] text-[#94A3B8] font-bold leading-none">
-                        防御
-                      </div>
-                      <div className="absolute bottom-[15%] left-[10%] text-[clamp(10px,0.7vw,20px)] text-[#94A3B8] font-bold leading-none">
-                        攻击
-                      </div>
-                      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="#475569" strokeWidth="2" />
+                <tr className="h-10 md:h-12 lg:h-[5.26%]">
+                  <th className="w-[8%] border-r border-b border-[#334155] bg-[#334155] relative overflow-hidden">
+                    <div className="absolute inset-0 z-0 pointer-events-none">
+                      <svg className="w-full h-full" preserveAspectRatio="none">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="#475569" strokeWidth="1.5" />
                       </svg>
+                    </div>
+                    <div className="absolute top-[8%] right-[8%] text-[clamp(11px,0.8vw,16px)] text-white/90 font-black leading-none z-10 pointer-events-none">
+                      防御
+                    </div>
+                    <div className="absolute bottom-[8%] left-[8%] text-[clamp(11px,0.8vw,16px)] text-white/90 font-black leading-none z-10 pointer-events-none">
+                      攻击
                     </div>
                   </th>
                   {ATTRIBUTES.map((attr) => {
@@ -388,9 +388,9 @@ export default function App() {
                   })}
                 </tr>
               </thead>
-              <tbody className="h-[94.74%]">
+              <tbody className="h-auto">
                 {ATTRIBUTES.map((atkAttr, aIdx) => (
-                  <tr key={`row-${atkAttr.id}`} className="h-[5.26%] group">
+                  <tr key={`row-${atkAttr.id}`} className="h-10 md:h-12 lg:h-[5.26%] group">
                     <td className="border-r border-b border-[#334155] bg-[#334155] p-0.5 group-hover:bg-[#475569] transition-colors relative">
                       <div className="w-full h-full rounded bg-[#0F172A] border border-[#334155] flex items-center justify-center md:justify-between px-[10%] text-[clamp(12px,1.2vw,32px)] font-black text-white uppercase overflow-hidden">
                         {(() => {
@@ -491,19 +491,19 @@ export default function App() {
       </main>
 
       {/* Footer Controls & Usage Guide */}
-      <footer className="p-4 bg-[#1e293b] border-t border-[#334155] shrink-0" id="footer-controls">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-          <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start">
-            <div className="px-3 py-1 bg-[#0F172A] border border-[#334155] rounded-full text-[10px] font-mono text-[#6366F1] uppercase tracking-tighter transition-all">
-              {isVerified ? 'STATUS: VALIDATION COMPLETE' : 'STATUS: READY FOR VALIDATION'}
+      <footer className="px-3 py-3 md:p-4 bg-[#1e293b] border-t border-[#334155] shrink-0" id="footer-controls">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 md:gap-4 mb-3 md:mb-4">
+          <div className="flex flex-wrap gap-2 items-center justify-center sm:justify-start">
+            <div className="px-2 py-0.5 bg-[#0F172A] border border-[#334155] rounded-full text-[8px] md:text-[10px] font-mono text-[#6366F1] uppercase tracking-tighter transition-all">
+              {isVerified ? 'STATUS: VALIDATION COMPLETE' : 'STATUS: READY'}
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-4 w-full md:w-auto items-center">
+          <div className="flex flex-wrap gap-2 w-full md:w-auto items-center">
             {isVerified && (
-              <div className="mr-4 flex flex-col items-end">
-                <span className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-widest">Score</span>
-                <span className="text-2xl font-black text-[#10B981] leading-none">{stats.percent}%</span>
+              <div className="mr-3 flex flex-col items-end">
+                <span className="text-[8px] text-[#94A3B8] font-bold uppercase tracking-widest">Score</span>
+                <span className="text-xl md:text-2xl font-black text-[#10B981] leading-none">{stats.percent}%</span>
               </div>
             )}
             <button
@@ -517,20 +517,20 @@ export default function App() {
                 }
               }}
               disabled={isVerified || isAutoFilled}
-              className={`flex-1 md:flex-none px-6 py-2 border rounded-lg text-sm font-semibold transition-all active:scale-95 flex items-center gap-2 ${
+              className={`flex-1 md:flex-none px-3 py-1.5 md:px-6 md:py-2 border rounded-lg text-xs md:text-sm font-semibold transition-all active:scale-95 flex items-center justify-center gap-1.5 ${
                 isVerified || isAutoFilled 
                 ? 'opacity-30 cursor-not-allowed border-[#334155] text-[#475569]' 
                 : 'border-amber-500/50 text-amber-500 hover:bg-amber-500/10'
               }`}
             >
               <Icons.Zap size={14} />
-              填入全部正确答案
+              <span className="whitespace-nowrap">自动填入</span>
             </button>
 
             <button
               id="btn-reset"
               onClick={resetAll}
-              className="flex-1 md:flex-none px-6 py-2 border border-[#334155] rounded-lg text-sm font-semibold text-[#94A3B8] hover:bg-[#334155] hover:text-white transition-all active:scale-95"
+              className="flex-1 md:flex-none px-3 py-1.5 md:px-6 md:py-2 border border-[#334155] rounded-lg text-xs md:text-sm font-semibold text-[#94A3B8] hover:bg-[#334155] hover:text-white transition-all active:scale-95 whitespace-nowrap"
             >
               重置表格
             </button>
@@ -539,7 +539,7 @@ export default function App() {
               <button
                 id="btn-mistakes"
                 onClick={() => setShowMistakes(true)}
-                className="flex-1 md:flex-none px-6 py-2 border border-[#334155] rounded-lg text-sm font-semibold text-[#F87171] hover:bg-[#452222] hover:text-red-400 transition-all active:scale-95"
+                className="flex-1 md:flex-none px-3 py-1.5 md:px-6 md:py-2 border border-[#334155] rounded-lg text-xs md:text-sm font-semibold text-[#F87171] hover:bg-[#452222] hover:text-red-400 transition-all active:scale-95 whitespace-nowrap"
               >
                 我的错题
               </button>
@@ -549,13 +549,13 @@ export default function App() {
               <button
                 id="btn-show-answers"
                 onClick={() => setShowAnswers(!showAnswers)}
-                className={`flex-1 md:flex-none px-6 py-2 border rounded-lg text-sm font-bold transition-all active:scale-95 shadow-lg ${
+                className={`flex-1 md:flex-none px-3 py-1.5 md:px-6 md:py-2 border rounded-lg text-xs md:text-sm font-bold transition-all active:scale-95 shadow-lg whitespace-nowrap ${
                   showAnswers 
                   ? 'bg-[#6366F1] border-[#818CF8] text-white shadow-indigo-500/20' 
                   : 'bg-[#1E293B] border-[#334155] text-[#94A3B8] hover:border-[#475569] hover:text-white'
                 }`}
               >
-                {showAnswers ? '隐藏正确答案' : '查看正确答案'}
+                {showAnswers ? '隐藏答案' : '查看答案'}
               </button>
             )}
 
@@ -564,9 +564,9 @@ export default function App() {
                 id="btn-verify"
                 onClick={verifyResults}
                 disabled={isAutoFilled}
-                className={`flex-1 md:w-56 px-10 py-2 rounded-lg text-sm font-bold shadow-xl transition-all active:scale-95 ${
+                className={`flex-1 md:w-48 px-4 py-1.5 md:px-10 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-xl transition-all active:scale-95 ${
                   isAutoFilled 
-                  ? 'bg-slate-700 text-slate-500 cursor-not-allowed shadow-none' 
+                  ? 'bg-slate-700 text-slate-500 shadow-none' 
                   : 'bg-[#4F46E5] hover:bg-[#4338CA] text-white shadow-indigo-950/40'
                 }`}
               >
@@ -576,7 +576,7 @@ export default function App() {
               <button
                 id="btn-edit"
                 onClick={continueTraining}
-                className="flex-1 md:w-56 px-10 py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-lg text-sm font-bold shadow-xl shadow-emerald-950/20 transition-all active:scale-95"
+                className="flex-1 md:w-48 px-4 py-1.5 md:px-10 md:py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-lg text-xs md:text-sm font-bold shadow-xl shadow-emerald-950/20 transition-all active:scale-95"
               >
                 继续修改 (Modify)
               </button>
@@ -584,8 +584,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* Usage Guide Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-[#334155]/50 text-[#94A3B8]">
+        {/* Usage Guide Section - Hidden on mobile/tablet, visible on large screens */}
+        <div className="hidden lg:grid grid-cols-4 gap-4 pt-4 border-t border-[#334155]/50 text-[#94A3B8]">
           <div className="flex gap-3">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">1</div>
             <div>
@@ -611,7 +611,7 @@ export default function App() {
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#334155] flex items-center justify-center text-xs font-bold text-white">4</div>
             <div>
               <h4 className="text-xs font-bold text-white mb-1">持续进阶</h4>
-              <p className="text-[10px] leading-relaxed">点击<span className="text-[#10B981] font-bold">继续修改</span>修正错误，或使用<span className="text-white font-bold">重置表格</span>重新开始，直至完成 324 个格位的全对大挑战！</p>
+              <p className="text-[10px] leading-relaxed">点击<span className="text-[#10B981] font-bold">继续修改</span>修正错误，或使用<span className="text-white font-bold">重置表格</span>重新开始，直至完成 324 个格点的全对大挑战！</p>
             </div>
           </div>
         </div>

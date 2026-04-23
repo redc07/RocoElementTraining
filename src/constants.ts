@@ -12,7 +12,7 @@ export const ATTRIBUTES: Attribute[] = [
   { id: "electric", name: "电", color: "#F59E0B", bgColor: "#FFFBEB", iconName: "Zap" },
   { id: "poison", name: "毒", color: "#A855F7", bgColor: "#F3E8FF", iconName: "Atom" },
   { id: "bug", name: "虫", color: "#84CC16", bgColor: "#F7FEE7", iconName: "Bug" },
-  { id: "martial", name: "格", color: "#B91C1C", bgColor: "#FEE2E2", iconName: "Hand" },
+  { id: "martial", name: "武", color: "#B91C1C", bgColor: "#FEE2E2", iconName: "Hand" },
   { id: "wing", name: "翼", color: "#8B5CF6", bgColor: "#EDE9FE", iconName: "Feather" },
   { id: "psychic", name: "萌", color: "#EC4899", bgColor: "#FCE7F3", iconName: "Heart" },
   { id: "ghost", name: "幽", color: "#4C1D95", bgColor: "#EDE9FE", iconName: "Ghost" },
@@ -24,10 +24,10 @@ export const ATTRIBUTES: Attribute[] = [
 /**
  * Effectiveness Matrix (Atk Row -> Def Col)
  * Multipliers: 2 (○), 0.5/0 (△), 1 (Normal)
- * Order: 普(0), 草(1), 火(2), 水(3), 光(4), 地(5), 冰(6), 龙(7), 电(8), 毒(9), 虫(10), 格(11), 翼(12), 萌(13), 幽(14), 恶(15), 机(16), 幻(17)
+ * Order: 普(0), 草(1), 火(2), 水(3), 光(4), 地(5), 冰(6), 龙(7), 电(8), 毒(9), 虫(10), 武(11), 翼(12), 萌(13), 幽(14), 恶(15), 机(16), 幻(17)
  */
 export const EFFECTIVENESS_MATRIX: number[][] = [
-  // 普, 草, 火, 水, 光, 地, 冰, 龙, 电, 毒, 虫, 格, 翼, 萌, 幽, 恶, 机, 幻
+  // 普, 草, 火, 水, 光, 地, 冰, 龙, 电, 毒, 虫, 武, 翼, 萌, 幽, 恶, 机, 幻
   [1, 1, 1, 1, 1, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0.5, 1], // 普
   [1, 1, 0.5, 2, 2, 2, 1, 0.5, 1, 0.5, 0.5, 1, 0.5, 1, 1, 1, 0.5, 1], // 草
   [1, 2, 1, 0.5, 1, 0.5, 2, 0.5, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1], // 火
