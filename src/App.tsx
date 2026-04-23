@@ -672,7 +672,12 @@ export default function App() {
               <button
                 id="btn-edit"
                 onClick={continueTraining}
-                className="flex-1 md:w-48 px-4 py-1.5 md:px-10 md:py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-lg text-xs md:text-sm font-bold shadow-xl shadow-emerald-950/20 transition-all active:scale-95"
+                disabled={showAnswers}
+                className={`flex-1 md:w-48 px-4 py-1.5 md:px-10 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-xl transition-all active:scale-95 ${
+                  showAnswers 
+                  ? 'bg-slate-700 text-slate-500 shadow-none cursor-not-allowed opacity-50' 
+                  : 'bg-[#10B981] hover:bg-[#059669] text-white shadow-emerald-950/20'
+                }`}
               >
                 继续修改 (Modify)
               </button>
