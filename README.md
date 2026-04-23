@@ -1,20 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 洛克王国世界属性克制训练系统 V1.0
 
-# Run and deploy your AI Studio app
+专业版洛克王国世界属性克制计算与训练系统，支持全 18 系属性克制关系查询与记忆测试。
 
-This contains everything you need to run your app locally.
+## 🎮 使用方法
 
-View your app in AI Studio: https://ai.studio/apps/bd216027-7767-4472-856a-9692f7bc466f
+### 1. 点选克制关系
+点击网格中的任何单元格进行状态切换：
+- **第一下点击**：设置为 **克制 (○)** —— 绿色圆圈
+- **第二下点击**：设置为 **被克制 (△)** —— 红色三角
+- **第三下点击**：回到 **普通倍数** —— 空白
 
-## Run Locally
+### 2. 提交并验证
+完成表格填写后，点击右下角的 **【点击验证 (Submit)】** 按钮：
+- 系统会自动对比内置的克制矩阵。
+- **错误选项**：会以红色呼吸光效示警，提示此处判断有误。
+- **正确选项**：会保持现状，确认记忆准确。
 
-**Prerequisites:**  Node.js
+### 3. 查看正确答案
+在验证状态下，点击 **【查看正确答案】** 按钮：
+- 系统会实时在您的选择上方叠加显示正确的克制符号。
+- 如果实际关系为 **“普通” (1.0x)** 而您选错了，格位中心会显示“普通”文字提示。
 
+### 4. 持续进阶训练
+- **修正错误**：点击 **【继续修改 (Modify)】** 回到编辑模式，修复那些被标记为红色的错误。
+- **重新挑战**：点击 **【重置表格】** 清空所有输入，从零开始开启新一轮的 324 个格位全对大挑战！
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠️ 技术栈
+- **框架**: React 18 + Vite
+- **样式**: Tailwind CSS
+- **动画**: Framer Motion
+- **图标**: Lucide React
+
+## 📱 适配说明
+系统支持全屏自适应布局，完美适配从手机到 4K 超宽屏的各种设备显示环境。
