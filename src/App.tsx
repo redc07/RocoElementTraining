@@ -150,7 +150,7 @@ export default function App() {
 
   const shareResult = () => {
     const rank = getRankInfo(stats.percent).rank;
-    const text = `我在【洛克王国世界属性克制训练系统】中获得了【${rank}】评价，正确率达 ${stats.percent}%！属性大师就是我，不服来挑战！\n挑战链接：https://roco-training.netlify.app/`;
+    const text = `我在【洛克王国·世界 属性克制训练工具】中获得了【${rank}】评价，正确率达 ${stats.percent}%！属性大师就是我，不服来挑战！\n挑战链接：https://roco-training.netlify.app/`;
     
     navigator.clipboard.writeText(text).then(() => {
       setShowToast(true);
@@ -355,7 +355,7 @@ export default function App() {
                 <Info size={32} />
               </div>
               
-              <h3 className="text-xl font-bold text-white mb-4 text-center">关于本系统</h3>
+              <h3 className="text-xl font-bold text-white mb-4 text-center">关于本工具</h3>
               
               <div className="space-y-4 text-sm text-[#94A3B8] leading-relaxed">
                 <p>
@@ -409,10 +409,10 @@ export default function App() {
           <div className="flex items-center gap-2">
             <div>
               <h1 className="text-sm md:text-base font-bold tracking-tight text-white uppercase whitespace-nowrap" id="app-title">
-                洛克王国·世界属性训练系统
+                洛克王国·世界 属性克制训练工具
               </h1>
               <p className="text-[6px] md:text-[8px] text-[#94A3B8] font-mono tracking-widest leading-none">
-                Roco Kingdom:World Attribute Training V1.0
+                Roco Kingdom:World Element Training V1.0
               </p>
             </div>
             <button 
