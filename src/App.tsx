@@ -8,6 +8,8 @@ import { ATTRIBUTES, EFFECTIVENESS_MATRIX } from './constants';
 import { Effectiveness } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 import * as Icons from 'lucide-react';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 const { 
   CheckCircle2, RotateCcw, Info, Check, X, Trophy, AlertTriangle,
@@ -25,6 +27,9 @@ export default function App() {
   );
   const [isVerified, setIsVerified] = useState(false);
   const [showAnswers, setShowAnswers] = useState(false);
+  const [showMistakes, setShowMistakes] = useState(false);
+  const [showRank, setShowRank] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   const toggleCell = useCallback((atkIdx: number, defIdx: number) => {
     if (isVerified) return;
@@ -40,6 +45,7 @@ export default function App() {
 
   const verifyResults = () => {
     setIsVerified(true);
+    setShowRank(true);
   };
 
   const [resetCounter, setResetCounter] = useState(0);
@@ -90,8 +96,173 @@ export default function App() {
     };
   }, [userMatrix]);
 
+  const mistakesList = useMemo(() => {
+    const list: Array<{ atkIdx: number, defIdx: number, userValue: Effectiveness, trueEnum: Effectiveness }> = [];
+    userMatrix.forEach((row, a) => {
+      row.forEach((val, d) => {
+        const { isCorrect, userValue, trueEnum } = getCellStatus(a, d);
+        if (!isCorrect) {
+          list.push({ atkIdx: a, defIdx: d, userValue, trueEnum });
+        }
+      });
+    });
+    return list;
+  }, [userMatrix, isVerified]);
+
+  const renderEffectIndicator = (e: Effectiveness) => {
+    if (e === Effectiveness.SUPER) {
+      return <div className="w-4 h-4 rounded-full border-2 border-[#10B981] inline-block align-middle" />;
+    }
+    if (e === Effectiveness.RESISTED) {
+      return <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-[#EF4444] inline-block align-middle" />;
+    }
+    return <span className="text-[#94A3B8] font-bold">普通</span>;
+  };
+
+  const getRankInfo = (percent: number) => {
+    if (percent === 100) return { rank: "神圣大祭司", comment: "无可挑剔！你对全系克制了如指掌，已达洛克世界的巅峰境界！", color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/30", icon: <Icons.Trophy className="text-amber-400" size={48} /> };
+    if (percent >= 95) return { rank: "皇家大法师", comment: "惊人的表现！你几乎掌握了所有的奥秘，仅剩毫厘即可封神。", color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/30", icon: <Icons.Star className="text-purple-400" size={48} /> };
+    if (percent >= 85) return { rank: "资深探险家", comment: "非常优秀！绝大多数属性已经难不住你了，继续保持！", color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/30", icon: <Icons.ShieldCheck className="text-blue-400" size={48} /> };
+    if (percent >= 71) return { rank: "进阶学徒", comment: "合格的表现。你已经掌握了基础克制，还需加强冷门属性的记忆。", color: "text-emerald-400", bg: "bg-emerald-400/10", border: "border-emerald-400/30", icon: <Icons.BookOpen className="text-emerald-400" size={48} /> };
+    return { rank: "属性初学者", comment: "路漫漫其修远兮，看来你还需要多在王国森林里历练一番呢！", color: "text-slate-400", bg: "bg-slate-400/10", border: "border-slate-400/30", icon: <Icons.Ghost className="text-slate-400" size={48} /> };
+  };
+
+  const shareResult = () => {
+    const rank = getRankInfo(stats.percent).rank;
+    const text = `我在【洛克王国世界属性克制训练系统】中获得了【${rank}】评价，正确率达 ${stats.percent}%！属性大师就是我，不服来挑战！\n挑战链接：https://roco-training.netlify.app/`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
+
+  const exportMistakesToExcel = async () => {
+    if (mistakesList.length === 0) return;
+    
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('我的错题集');
+
+    // 1. Add Metadata Info
+    const metaData = [
+      ["测试项目：", "洛克王国世界属性克制训练"],
+      ["测试结果：", `正确率 ${stats.percent}% (${stats.correct}/${stats.total})`],
+      ["测试时间：", new Date().toLocaleString()],
+      ["测试链接：", "https://roco-training.netlify.app/"],
+    ];
+
+    metaData.forEach((row, i) => {
+      const r = worksheet.addRow(row);
+      r.getCell(1).font = { bold: true, color: { argb: 'FF4F46E5' }, size: 11 };
+      r.getCell(2).font = { size: 11 };
+    });
+
+    worksheet.addRow([]); // Blank row
+
+    // 2. Add Table Headers
+    const headerRow = worksheet.addRow(["序号", "攻击方属性", "防御方属性", "你的选择", "正确答案"]);
+    headerRow.height = 25;
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4F46E5' }
+      };
+      cell.font = {
+        bold: true,
+        color: { argb: 'FFFFFFFF' },
+        size: 12
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+
+    // 3. Add Data Rows
+    mistakesList.forEach((mistake, idx) => {
+      const getEffectName = (e: Effectiveness) => {
+        if (e === Effectiveness.SUPER) return "克制 (○)";
+        if (e === Effectiveness.RESISTED) return "被克制 (▽)";
+        return "普通";
+      };
+
+      const row = worksheet.addRow([
+        idx + 1,
+        ATTRIBUTES[mistake.atkIdx].name,
+        ATTRIBUTES[mistake.defIdx].name,
+        getEffectName(mistake.userValue),
+        getEffectName(mistake.trueEnum)
+      ]);
+
+      row.height = 22;
+      row.eachCell((cell, colNumber) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+        
+        // Specific coloring for choice and answer columns
+        if (colNumber === 4 || colNumber === 5) {
+          const val = cell.value ? cell.value.toString() : '';
+          if (val.includes('克制 (○)')) {
+            cell.font = { color: { argb: 'FF10B981' }, bold: true }; // Green
+          } else if (val.includes('被克制 (▽)')) {
+            cell.font = { color: { argb: 'FFEF4444' }, bold: true }; // Red
+          } else if (val.includes('普通')) {
+            cell.font = { color: { argb: 'FF64748B' } }; // Dark Gray (Slate-500)
+          }
+        }
+      });
+    });
+
+    // 4. Adjust Column Widths
+    worksheet.getColumn(1).width = 8;
+    worksheet.getColumn(2).width = 18;
+    worksheet.getColumn(3).width = 18;
+    worksheet.getColumn(4).width = 22;
+    worksheet.getColumn(5).width = 22;
+
+    // 5. Generate and Save File
+    const now = new Date();
+    const formattedDate = now.getFullYear().toString() + 
+                         (now.getMonth() + 1).toString().padStart(2, '0') + 
+                         now.getDate().toString().padStart(2, '0') + 
+                         now.getHours().toString().padStart(2, '0') + 
+                         now.getMinutes().toString().padStart(2, '0');
+    
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `洛克王国世界属性训练错题集_${stats.percent}分_${formattedDate}.xlsx`);
+  };
+
   return (
     <div className="h-screen bg-[#0F172A] text-[#E2E8F0] font-sans flex flex-col overflow-hidden" id="app-root">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 20 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed top-0 left-0 right-0 z-[200] flex justify-center pointer-events-none"
+          >
+            <div className="bg-[#10B981] text-white px-6 py-3 rounded-full shadow-2xl shadow-emerald-500/30 flex items-center gap-3 border border-emerald-400/50 backdrop-blur-sm">
+              <Icons.CheckCircle2 size={18} />
+              <span className="text-sm font-bold tracking-wide">🎉 分享链接已复制到剪贴板，快去分享吧！</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-2 bg-[#1E293B] border-b border-[#334155] shadow-lg sticky top-0 z-50 shrink-0" id="main-header">
         <div className="flex items-center gap-3">
@@ -113,8 +284,8 @@ export default function App() {
             <span className="text-[#94A3B8] font-medium">克制 (○)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-b-[#EF4444]" />
-            <span className="text-[#94A3B8] font-medium">被克制 (△)</span>
+            <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-[#EF4444]" />
+            <span className="text-[#94A3B8] font-medium">被克制 (▽)</span>
           </div>
         </div>
       </header>
@@ -201,7 +372,7 @@ export default function App() {
                                   height: 0,
                                   borderLeft: 'clamp(7px, 0.9vw, 24px) solid transparent',
                                   borderRight: 'clamp(7px, 0.9vw, 24px) solid transparent',
-                                  borderBottom: 'clamp(12px, 1.6vw, 42px) solid #EF4444',
+                                  borderTop: 'clamp(12px, 1.6vw, 42px) solid #EF4444',
                                 }}
                                 className={showAnswers && trueEnum !== Effectiveness.RESISTED ? 'opacity-20' : ''}
                               />
@@ -221,7 +392,7 @@ export default function App() {
                                     height: 0,
                                     borderLeft: 'clamp(7px, 0.9vw, 24px) solid transparent',
                                     borderRight: 'clamp(7px, 0.9vw, 24px) solid transparent',
-                                    borderBottom: 'clamp(12px, 1.6vw, 42px) solid #F87171',
+                                    borderTop: 'clamp(12px, 1.6vw, 42px) solid #F87171',
                                     filter: 'drop-shadow(0 0 0.6vw rgba(248,113,113,0.7))'
                                   }}
                                   className="z-10"
@@ -281,6 +452,16 @@ export default function App() {
               重置表格
             </button>
             
+            {isVerified && (
+              <button
+                id="btn-mistakes"
+                onClick={() => setShowMistakes(true)}
+                className="flex-1 md:flex-none px-6 py-2 border border-[#334155] rounded-lg text-sm font-semibold text-[#F87171] hover:bg-[#452222] hover:text-red-400 transition-all active:scale-95"
+              >
+                我的错题
+              </button>
+            )}
+
             {isVerified && (
               <button
                 id="btn-show-answers"
@@ -347,6 +528,201 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Mistakes Modal */}
+      <AnimatePresence>
+        {showMistakes && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowMistakes(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#1E293B] w-full max-w-2xl max-h-full rounded-2xl border border-[#334155] shadow-2xl flex flex-col overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="px-6 py-4 border-b border-[#334155] flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400">
+                    <AlertTriangle size={18} />
+                  </div>
+                  <h3 className="text-lg font-bold text-white">本次错题统计 ({mistakesList.length})</h3>
+                </div>
+                <button 
+                  onClick={() => setShowMistakes(false)}
+                  className="p-2 hover:bg-[#334155] rounded-lg text-[#94A3B8] transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
+                {mistakesList.length === 0 ? (
+                  <div className="py-20 text-center flex flex-col items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                      <Trophy size={32} />
+                    </div>
+                    <p className="text-[#94A3B8]">全对了！你真是个属性专家！</p>
+                  </div>
+                ) : (
+                  mistakesList.map((mistake, idx) => {
+                    const atkAttr = ATTRIBUTES[mistake.atkIdx];
+                    const defAttr = ATTRIBUTES[mistake.defIdx];
+                    return (
+                      <div key={idx} className="p-4 bg-[#0F172A] rounded-xl border border-[#334155] text-sm leading-relaxed">
+                        <div className="flex gap-4 items-start">
+                          <span className="text-[#6366F1] font-mono shrink-0 pt-1">{idx + 1}.</span>
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center gap-1 text-[#E2E8F0]">
+                              <span>你的选择：</span>
+                              <span className="font-bold underline underline-offset-4 decoration-[#334155]">{atkAttr.name}</span>
+                              <span className="text-[#94A3B8] mx-1">对</span>
+                              <span className="font-bold underline underline-offset-4 decoration-[#334155]">{defAttr.name}</span>
+                              <span className="ml-1">{renderEffectIndicator(mistake.userValue)}</span>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-1 text-emerald-400 font-medium">
+                              <span>正确答案：</span>
+                              <span className="font-bold underline underline-offset-4 decoration-emerald-500/30">{atkAttr.name}</span>
+                              <span className="text-emerald-500/50 mx-1">对</span>
+                              <span className="font-bold underline underline-offset-4 decoration-emerald-500/30">{defAttr.name}</span>
+                              <span className="ml-1">{renderEffectIndicator(mistake.trueEnum)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              
+              <div className="px-6 py-4 bg-[#0F172A]/50 border-t border-[#334155] flex justify-between items-center shrink-0">
+                {mistakesList.length > 0 ? (
+                  <button 
+                    onClick={exportMistakesToExcel}
+                    className="px-6 py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-lg text-xs font-bold transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-emerald-900/20"
+                  >
+                    <Icons.FileSpreadsheet size={16} />
+                    导出错题集 (Excel)
+                  </button>
+                ) : <div />}
+                
+                <button 
+                  onClick={() => setShowMistakes(false)}
+                  className="px-8 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg text-sm font-bold transition-all active:scale-95"
+                >
+                  我知道了
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Rank Result Modal */}
+      <AnimatePresence>
+        {showRank && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            onClick={() => setShowRank(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.85, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.85, y: 40 }}
+              className="bg-[#1E293B] w-full max-w-md rounded-2xl border border-[#334155] shadow-2xl flex flex-col overflow-hidden text-center overflow-y-auto max-h-[90vh]"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="pt-10 pb-6 flex flex-col items-center gap-6">
+                <motion.div 
+                  initial={{ rotate: -15, scale: 0 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
+                >
+                  {getRankInfo(stats.percent).icon}
+                </motion.div>
+                
+                <div className="space-y-1">
+                  <span className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-[0.3em]">Evaluation Result</span>
+                  <h2 className={`text-3xl font-black ${getRankInfo(stats.percent).color}`}>
+                    {getRankInfo(stats.percent).rank}
+                  </h2>
+                </div>
+              </div>
+
+              <div className="px-8 space-y-6">
+                <div className={`py-4 rounded-xl border ${getRankInfo(stats.percent).bg} ${getRankInfo(stats.percent).border}`}>
+                  <div className="text-4xl font-black text-white leading-none">
+                    {stats.percent}<span className="text-lg ml-1 opacity-50">%</span>
+                  </div>
+                  <div className="text-[10px] text-[#94A3B8] font-bold uppercase mt-2 tracking-widest">Accuracy Score</div>
+                </div>
+
+                <div className="bg-[#0F172A] p-6 rounded-xl border border-[#334155] relative overflow-hidden">
+                   <div className="absolute top-0 left-0 w-1 h-full bg-[#4F46E5]" />
+                   <p className="text-sm text-[#E2E8F0] leading-relaxed italic">
+                     "{getRankInfo(stats.percent).comment}"
+                   </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 text-xs font-bold text-[#94A3B8]">
+                  <div className="p-3 bg-[#0F172A] rounded-lg border border-[#334155]">
+                    <div className="text-white opacity-40 mb-1">正确</div>
+                    <div className="text-lg text-emerald-400">{stats.correct} / {stats.total}</div>
+                  </div>
+                  <div className="p-3 bg-[#0F172A] rounded-lg border border-[#334155]">
+                    <div className="text-white opacity-40 mb-1">错误</div>
+                    <div className="text-lg text-red-400">{stats.total - stats.correct}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-8 pb-8 mt-4">
+                {stats.percent === 100 ? (
+                  <button 
+                    onClick={() => setShowRank(false)}
+                    className="w-full py-4 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl font-black tracking-widest shadow-xl shadow-indigo-950/40 transition-all active:scale-95 uppercase text-sm"
+                  >
+                    太强了，退隐江湖
+                  </button>
+                ) : (
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => setShowRank(false)}
+                      className="flex-1 py-3 bg-[#334155] hover:bg-[#475569] text-white rounded-xl font-bold transition-all active:scale-95 text-xs"
+                    >
+                      关闭
+                    </button>
+                    <button 
+                      onClick={shareResult}
+                      className="flex-1 py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white rounded-xl font-bold transition-all active:scale-95 text-xs flex items-center justify-center gap-2"
+                    >
+                      <Icons.Share2 size={14} />
+                      去分享
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowRank(false);
+                        setShowMistakes(true);
+                      }}
+                      className="flex-1 py-3 bg-[#EF4444] hover:bg-[#DC2626] text-white rounded-xl font-bold transition-all active:scale-95 text-xs"
+                    >
+                      我的错题
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
